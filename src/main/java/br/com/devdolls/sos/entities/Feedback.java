@@ -7,12 +7,14 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
-@Entity(name = "FEEDBACK")
+@Entity(name = "feedback")
 public class Feedback {
     @Id
     @Column(name = "feedback_id")
     private Integer id;
 
+    @ManyToOne
+    @JoinColumn(name = "usuario", nullable = false)
     private Usuario autor;
 
     @Column(name = "data_hora")

@@ -15,10 +15,10 @@ public class Usuario {
     @Column(name = "usuario_id")
     private Integer id;
 
-    @Column(name = "email")
+    @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 
     @ManyToOne

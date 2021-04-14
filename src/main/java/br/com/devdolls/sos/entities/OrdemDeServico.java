@@ -19,7 +19,7 @@ public class OrdemDeServico {
     @Column(name = "desc", columnDefinition = "TEXT")
     private String descricao;
 
-    @Column(name = "data_abertura")
+    @Column(name = "data_abertura", nullable = false)
     private LocalDate dataAbertura;
 
     @Column(name = "data_fechamento")

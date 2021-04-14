@@ -10,6 +10,6 @@ public class Status {
     @Column(name = "status_id")
     private Integer id;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 }

@@ -13,11 +13,14 @@ public class Feedback {
     @Column(name = "feedback_id")
     private Integer id;
 
+    @Column(name = "desc", columnDefinition = "TEXT")
+    private String descricao;
+
     @ManyToOne
     @JoinColumn(name = "usuario", nullable = false)
     private Usuario autor;
 
-    @Column(name = "data_hora")
+    @Column(name = "data_hora", nullable = false)
     private LocalDateTime dataDeCriacao;
 
     @ManyToOne

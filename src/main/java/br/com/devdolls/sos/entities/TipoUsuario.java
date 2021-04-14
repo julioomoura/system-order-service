@@ -10,6 +10,6 @@ public class TipoUsuario {
     @Column(name = "tipo_id")
     private Integer id;
 
-    @Column(name = "nome")
+    @Column(name = "nome", nullable = false)
     private String nome;
 }

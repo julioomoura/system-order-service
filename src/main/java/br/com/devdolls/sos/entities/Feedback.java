@@ -17,7 +17,7 @@ public class Feedback {
     private String descricao;
 
     @ManyToOne
-    @JoinColumn(name = "usuario", nullable = false)
+    @JoinColumn(name = "autor", nullable = false)
     private Usuario autor;
 
     @Column(name = "data_hora", nullable = false)

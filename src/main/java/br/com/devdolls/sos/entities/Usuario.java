@@ -22,9 +22,9 @@ public class Usuario {
     private String nome;
 
     @ManyToOne
-    @JoinColumn(name = "tipo_usuario", nullable = false)
+    @JoinColumn(name = "tipo", nullable = false)
     private TipoUsuario tipo;
 
-    @OneToMany(mappedBy = "os")
+    @OneToMany(mappedBy = "cliente")
     private List<OrdemDeServico> ordensDeServico;
 }

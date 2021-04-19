@@ -6,9 +6,9 @@ services:
     container_name: system-order-service-database
     restart: always
     ports:
-      - 3306:3306
+      - 3307:3306
     expose:
-      - 3306
+      - 3307
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: estagio_hiragi

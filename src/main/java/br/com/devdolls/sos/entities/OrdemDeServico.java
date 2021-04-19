@@ -32,7 +32,7 @@ public class OrdemDeServico {
     private Integer prazoParaConclusao;
 
     @ManyToOne
-    @JoinColumn(name = "usuario", nullable = false)
+    @JoinColumn(name = "cliente", nullable = false)
     private Usuario cliente;
 
     @ManyToOne

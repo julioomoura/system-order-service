@@ -26,14 +26,21 @@ $ sudo snap install intellij-idea-community --classic
 
 ## Rodando o projeto
 
-### Subir um container docker com o MySQL
+### Setup do banco de dados MySQL
+
+#### Subir um container docker com o MySQL
 ```
 $ docker-compose up -d
 ```
 
-### Acompanhar os logs do container
+#### Acompanhar os logs do container
 ```
 $ docker-compose logs -f
+```
+
+#### Script para criação de esquema
+```
+$ bash setup-db.sh
 ```
 
 ### Compilar o projeto

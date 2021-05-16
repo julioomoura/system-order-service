@@ -1,5 +1,7 @@
 package br.com.devdolls.sos.entities;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,6 +12,7 @@ import javax.persistence.OneToOne;
 import java.util.List;
 
 @Entity(name = "usuario")
+@Data
 public class Usuario {
     @Id
     @Column(name = "usuario_id")
@@ -24,7 +27,4 @@ public class Usuario {
     @ManyToOne
     @JoinColumn(name = "tipo", nullable = false)
     private TipoUsuario tipo;
-
-    @OneToMany(mappedBy = "cliente")
-    private List<OrdemDeServico> ordensDeServico;
 }

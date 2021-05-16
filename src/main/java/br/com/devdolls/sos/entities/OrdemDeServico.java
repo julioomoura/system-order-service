@@ -1,5 +1,7 @@
 package br.com.devdolls.sos.entities;
 
+import lombok.Data;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -10,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity(name = "os")
+@Data
 public class OrdemDeServico {
 
     @Id
@@ -34,6 +37,10 @@ public class OrdemDeServico {
     @ManyToOne
     @JoinColumn(name = "cliente", nullable = false)
     private Usuario cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "dev", nullable = false)
+    private Usuario desenvolvedor;
 
     @ManyToOne
     @JoinColumn(name = "status", nullable = false)

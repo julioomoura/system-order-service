@@ -20,6 +20,6 @@ public class DevController {
     @GetMapping
     public ResponseEntity<List<Usuario>> buscaDesenvolvedores() {
 
-        return ResponseEntity.ok(usuarioRepository.findAllByTipoId(2));
+        return ResponseEntity.ok(usuarioRepository.findAllByTipoNome("dev"));
     }
 }

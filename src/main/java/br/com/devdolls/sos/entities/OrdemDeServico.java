@@ -42,10 +42,6 @@ public class OrdemDeServico {
     @JoinColumn(name = "dev", nullable = false)
     private Usuario desenvolvedor;
 
-    @ManyToOne
-    @JoinColumn(name = "status", nullable = false)
-    private Status status;
-
     @Column(name = "justificativa", columnDefinition = "TEXT")
     private String justificativa;
 
@@ -54,5 +50,11 @@ public class OrdemDeServico {
 
     @OneToMany(mappedBy = "ordemDeServico")
     private List<Feedback> feedbacks;
+
+    private Status status;
+
+    public enum Status {
+        ABERTA, DESENVOLVIMENTO, FECHADA;
+    }
 
 }

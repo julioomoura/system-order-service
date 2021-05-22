@@ -59,25 +59,9 @@ CREATE TABLE `os` (
   `assunto` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`os_id`),
   KEY `fk_cliente_idx` (`cliente`),
-  KEY `fk_status_idx` (`status`),
   KEY `fk_dev_idx` (`dev`),
   CONSTRAINT `fk_cliente` FOREIGN KEY (`cliente`) REFERENCES `usuario` (`usuario_id`),
-  CONSTRAINT `fk_dev` FOREIGN KEY (`dev`) REFERENCES `usuario` (`usuario_id`),
-  CONSTRAINT `fk_status` FOREIGN KEY (`status`) REFERENCES `status` (`status_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `status`
---
-
-DROP TABLE IF EXISTS `status`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `status` (
-  `status_id` int NOT NULL AUTO_INCREMENT,
-  `nome` varchar(255) NOT NULL,
-  PRIMARY KEY (`status_id`)
+  CONSTRAINT `fk_dev` FOREIGN KEY (`dev`) REFERENCES `usuario` (`usuario_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 

@@ -1,9 +1,15 @@
 package br.com.devdolls.sos.entities;
 
+import br.com.devdolls.sos.entities.enums.Status;
 import lombok.Data;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -17,9 +23,10 @@ public class OrdemDeServico {
 
     @Id
     @Column(name = "os_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "desc", columnDefinition = "TEXT")
+    @Column(name = "\"desc\"", columnDefinition = "TEXT")
     private String descricao;
 
     @Column(name = "data_abertura", nullable = false)
@@ -38,8 +45,9 @@ public class OrdemDeServico {
     @JoinColumn(name = "cliente", nullable = false)
     private Usuario cliente;
 
+    @ToString.Exclude
     @ManyToOne
-    @JoinColumn(name = "dev", nullable = false)
+    @JoinColumn(name = "dev")
     private Usuario desenvolvedor;
 
     @Column(name = "justificativa", columnDefinition = "TEXT")
@@ -51,10 +59,7 @@ public class OrdemDeServico {
     @OneToMany(mappedBy = "ordemDeServico")
     private List<Feedback> feedbacks;
 
+    @Enumerated(EnumType.ORDINAL)
+    @Column(name = "status")
     private Status status;
-
-    public enum Status {
-        ABERTA, DESENVOLVIMENTO, FECHADA;
-    }
-
 }

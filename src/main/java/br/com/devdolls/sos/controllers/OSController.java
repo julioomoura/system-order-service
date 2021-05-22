@@ -1,14 +1,18 @@
 package br.com.devdolls.sos.controllers;
 
 import br.com.devdolls.sos.dtos.FeedbackDTO;
+import br.com.devdolls.sos.dtos.OrdemDeServicoDTO;
 import br.com.devdolls.sos.entities.Feedback;
 import br.com.devdolls.sos.entities.OrdemDeServico;
 import br.com.devdolls.sos.entities.Usuario;
+import br.com.devdolls.sos.entities.enums.Status;
 import br.com.devdolls.sos.repositories.FeedbackRepository;
 import br.com.devdolls.sos.repositories.OSRepository;
 import br.com.devdolls.sos.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -32,31 +36,48 @@ public class OSController {
     private final UsuarioRepository usuarioRepository;
     private final FeedbackRepository feedBackRepository;
 
-    @GetMapping
-    public ResponseEntity<List<OrdemDeServico>> buscarOrdensDeServico(@RequestParam(name = "dev", required = false) final Integer dev) {
-        if (dev != null) {
-            return ResponseEntity.ok(repository.findAllByDesenvolvedorId(dev));
-        } else {
-            return ResponseEntity.ok(repository.findAll());
-        }
+    @PostMapping
+    public ResponseEntity<OrdemDeServico> criarOrdemDeServico(@RequestBody final OrdemDeServicoDTO dto) {
 
+        OrdemDeServico os = new OrdemDeServico();
+        os.setDescricao(dto.getDescricao());
+        os.setDataAbertura(LocalDate.now());
+        os.setStatus(Status.ABERTA);
+
+        Optional<Usuario> user = usuarioRepository.findById(dto.getClienteId());
+
+        return user.map(usuario -> {
+                    os.setCliente(usuario);
+                    OrdemDeServico saved = repository.save(os);
+                    return ResponseEntity.ok(saved);
+                }
+        ).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<OrdemDeServico>> buscarOrdensDeServico(
+            @RequestParam(name = "dev", required = false) final Integer dev,
+            @RequestParam(name = "cliente", required = false) final Integer cliente,
+            @RequestParam(name = "status", required = false) final String status
+    ) {
+        return ResponseEntity.ok(getOsByParams(dev, cliente, status));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrdemDeServico> buscarOrdemDeServico(@PathVariable("id") final Integer id) {
-        Optional<OrdemDeServico> optionalOrdemDeServico = repository.findById(id);
-
-        return ResponseEntity.ok(optionalOrdemDeServico.get());
+        return repository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{ordemId}/devs/{devId}")
+    @Transactional
     public ResponseEntity<OrdemDeServico> distribuirOrdemDeServico(@PathVariable("ordemId") final Integer ordemId,
-                                                                   @PathVariable("devId") final Integer devId) {
+                                                                   @PathVariable("devId") final Integer devId,
+                                                                   @RequestBody final OrdemDeServicoDTO dto) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(devId);
         Optional<OrdemDeServico> ordemOptional = repository.findById(ordemId);
-
-        // TODO() Muda status da OS
 
         if (usuarioOptional.isEmpty() || ordemOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
@@ -64,17 +85,18 @@ public class OSController {
 
         ordemOptional.get().setDesenvolvedor(usuarioOptional.get());
         ordemOptional.get().setDataInicioAtendimento(LocalDate.now());
+        ordemOptional.get().setPrazoParaConclusao(dto.getPrazo());
 
         return ResponseEntity.ok(ordemOptional.get());
     }
 
     @GetMapping("/{ordemId}/feedbacks")
     public ResponseEntity<List<Feedback>> retornaFeedbacksDaOs(@PathVariable("ordemId") final Integer ordemId) {
-        List<Feedback> feedbacks = feedBackRepository.findAllByOsId(ordemId);
+        List<Feedback> feedbacks = feedBackRepository.findAllByOrdemDeServicoId(ordemId);
         return ResponseEntity.ok(feedbacks);
     }
 
-    @PostMapping("/{ordemId}")
+    @PostMapping("/{ordemId}/feedbacks")
     public ResponseEntity<Feedback> postarFeedback(@RequestBody final FeedbackDTO feedbackDTO,
                                                    @PathVariable("ordemId") final Integer ordemId) {
 
@@ -94,5 +116,39 @@ public class OSController {
         Feedback saved = feedBackRepository.save(feedback);
 
         return ResponseEntity.ok(saved);
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public ResponseEntity<Void> fecharOs(@PathVariable Integer id) {
+        repository.findById(id).ifPresent(os -> os.setStatus(Status.FECHADA));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    private List<OrdemDeServico> getOsByParams(final Integer dev, final Integer cliente, final String status) {
+        if (dev != null && cliente != null && status != null) {
+            return repository.findAllByDesenvolvedorIdAndClienteIdAndStatus(dev, cliente, Status.valueOf(status));
+        }
+
+        if (dev != null) {
+            if (cliente != null) {
+                return repository.findByDesenvolvedorIdAndClienteId(dev, cliente);
+            } else if (status != null) {
+                return repository.findByDesenvolvedorIdAndStatus(dev, Status.valueOf(status));
+            } else {
+                return repository.findByDesenvolvedorId(dev);
+            }
+        } else if (cliente != null) {
+            if (status != null) {
+                return repository.findAllByClienteIdAndStatus(cliente, Status.valueOf(status));
+            } else {
+                return repository.findAllByClienteId(cliente);
+            }
+        } else if (status != null) {
+            return repository.findAllByStatus(Status.valueOf(status));
+        } else {
+            return repository.findAll();
+        }
     }
 }

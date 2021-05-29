@@ -2,7 +2,7 @@ spring:
     datasource:
         password: root
         username: root
-        url: jdbc:mysql://localhost:3307/estagio_hiragi
+        url: jdbc:mysql://db:3306/estagio_hiragi
     jpa:
         hibernate:
             ddl-auto: validate

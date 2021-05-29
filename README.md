@@ -1,8 +1,32 @@
 # System Order Service - SOS
+Este é um projeto realizado para a matéria estágio supervisionado no curso de Ciência da Computação no CEUB. É uma aplicação responsável pelo gerenciamento de ordens de serviço. O fluxo básico da aplicação é:
 
+1. Um **cliente** cria uma ordem de serviço
+
+2. Um **administrador** visualizar ordens de serviço e distribui para desenvolvedores atenderem o serviço, até certo 
+   prazo de dias.
+   
+3. O desenvolvedor visualiza as ordens de serviço atribuídas a ele. Realiza o trabalho e finaliza a ordem de serviço.
+   
 ## Setup para rodar o projeto
 
-### Instalação do Java 11
+### Usando o docker para rodar a aplicação completa(Backend Server e MySQL Server)
+
+Clonando o repositório
+
+```
+$ git clone git@github.com:julioomoura/system-order-service.git
+```
+
+Rodando a aplicação
+
+```
+$ docker-compose up --build
+```
+
+Só esperar o build e a execução do projeto. Por padrão a aplicação está sendo exposto na porta **8080**.
+
+### Rodando a aplicação no terminal
 Para instalar o Java 11 podemos utilizar o sdkman
 
 ```
@@ -13,42 +37,7 @@ $ curl -s "https://get.sdkman.io" | bash
 $ source "$HOME/.sdkman/bin/sdkman-init.sh"
 ```
 
+Usar a versão 11 do Java
 ```
-$ sdk install java 11.0.10.hs-adpt
-```
-
-### Instalação do IntelliJ
-Para o desenvolvimento, utilizaremos a IDE IntelliJ IDEA
-
-```
-$ sudo snap install intellij-idea-community --classic
-```
-
-## Rodando o projeto
-
-### Setup do banco de dados MySQL
-
-#### Subir um container docker com o MySQL
-```
-$ docker-compose up -d
-```
-
-#### Acompanhar os logs do container
-```
-$ docker-compose logs -f
-```
-
-#### Script para criação de esquema
-```
-$ bash setup-db.sh
-```
-
-### Compilar o projeto
-```
-$ ./mvnw clean compile    
-```
-
-### Executar o projeto
-```
-$ ./mvnw spring-boot:run
+$ sdk env
 ```

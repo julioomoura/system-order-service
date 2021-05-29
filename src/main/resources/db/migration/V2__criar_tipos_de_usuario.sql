@@ -1,0 +1,1 @@
+INSERT INTO tipo_usuario (nome) VALUES ('admin'), ('cliente'), ('dev');

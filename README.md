@@ -41,3 +41,7 @@ Usar a versão 11 do Java
 ```
 $ sdk env
 ```
+Rodando a aplicação utilizando o Maven
+```
+$ ./mvnw spring-boot:run
+```

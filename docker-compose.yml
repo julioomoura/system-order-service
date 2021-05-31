@@ -5,6 +5,8 @@ services:
     image: mysql:8.0.23
     container_name: system-order-service-database
     restart: always
+    networks:
+      - ordem-de-servico-network
     ports:
       - 3307:3306
     expose:
@@ -12,3 +14,18 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: estagio_hiragi
+  server:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: system-order-service-server
+    restart: on-failure
+    ports:
+      - 8080:8080
+    networks:
+      - ordem-de-servico-network
+    depends_on:
+      - db
+
+networks:
+  ordem-de-servico-network:

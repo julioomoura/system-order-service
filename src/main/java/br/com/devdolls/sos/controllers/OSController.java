@@ -60,7 +60,9 @@ public class OSController {
             @RequestParam(name = "cliente", required = false) final Integer cliente,
             @RequestParam(name = "status", required = false) final String status
     ) {
-        return ResponseEntity.ok(getOsByParams(dev, cliente, status));
+        Status convertedStatus = Optional.ofNullable(status).map(Status::valueOf).orElse(null);
+
+        return ResponseEntity.ok(repository.findAllByDesenvolvedorIdAndClienteIdAndStatus(dev, cliente,convertedStatus));
     }
 
     @GetMapping("/{id}")
@@ -126,29 +128,10 @@ public class OSController {
         return ResponseEntity.noContent().build();
     }
 
-    private List<OrdemDeServico> getOsByParams(final Integer dev, final Integer cliente, final String status) {
-        if (dev != null && cliente != null && status != null) {
-            return repository.findAllByDesenvolvedorIdAndClienteIdAndStatus(dev, cliente, Status.valueOf(status));
-        }
+    @GetMapping("/usuarios")
+    public ResponseEntity<List<Usuario>> buscaUsuarios(@RequestParam(value = "nome", required = false) final String nome,
+                                                       @RequestParam(value = "email", required = false) final String email) {
 
-        if (dev != null) {
-            if (cliente != null) {
-                return repository.findByDesenvolvedorIdAndClienteId(dev, cliente);
-            } else if (status != null) {
-                return repository.findByDesenvolvedorIdAndStatus(dev, Status.valueOf(status));
-            } else {
-                return repository.findByDesenvolvedorId(dev);
-            }
-        } else if (cliente != null) {
-            if (status != null) {
-                return repository.findAllByClienteIdAndStatus(cliente, Status.valueOf(status));
-            } else {
-                return repository.findAllByClienteId(cliente);
-            }
-        } else if (status != null) {
-            return repository.findAllByStatus(Status.valueOf(status));
-        } else {
-            return repository.findAll();
-        }
+        return ResponseEntity.ok(usuarioRepository.findByNomeAndEmail(nome, email));
     }
 }

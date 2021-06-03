@@ -6,9 +6,9 @@ import br.com.devdolls.sos.entities.Feedback;
 import br.com.devdolls.sos.entities.OrdemDeServico;
 import br.com.devdolls.sos.entities.Usuario;
 import br.com.devdolls.sos.entities.enums.Status;
-import br.com.devdolls.sos.repositories.FeedbackRepository;
-import br.com.devdolls.sos.repositories.OSRepository;
 import br.com.devdolls.sos.repositories.UsuarioRepository;
+import br.com.devdolls.sos.services.feedback.FeedbackService;
+import br.com.devdolls.sos.services.os.OSService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,26 +30,17 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class OSController {
 
-    private final OSRepository repository;
+    private final OSService osService;
     private final UsuarioRepository usuarioRepository;
-    private final FeedbackRepository feedBackRepository;
+    private final FeedbackService feedbackService;
 
     @PostMapping
     public ResponseEntity<OrdemDeServico> criarOrdemDeServico(@RequestBody final OrdemDeServicoDTO dto) {
 
-        OrdemDeServico os = new OrdemDeServico();
-        os.setDescricao(dto.getDescricao());
-        os.setDataAbertura(LocalDate.now());
-        os.setStatus(Status.ABERTA);
-
         Optional<Usuario> user = usuarioRepository.findById(dto.getClienteId());
 
-        return user.map(usuario -> {
-                    os.setCliente(usuario);
-                    OrdemDeServico saved = repository.save(os);
-                    return ResponseEntity.ok(saved);
-                }
-        ).orElse(ResponseEntity.notFound().build());
+        return user.map(usuario -> ResponseEntity.ok(osService.cria(dto, usuario)))
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping
@@ -62,12 +51,12 @@ public class OSController {
     ) {
         Status convertedStatus = Optional.ofNullable(status).map(Status::valueOf).orElse(null);
 
-        return ResponseEntity.ok(repository.findAllByDesenvolvedorIdAndClienteIdAndStatus(dev, cliente,convertedStatus));
+        return ResponseEntity.ok(osService.buscaTodos(dev, cliente, convertedStatus));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrdemDeServico> buscarOrdemDeServico(@PathVariable("id") final Integer id) {
-        return repository.findById(id)
+        return osService.buscaPorId(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -79,23 +68,23 @@ public class OSController {
                                                                    @RequestBody final OrdemDeServicoDTO dto) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(devId);
-        Optional<OrdemDeServico> ordemOptional = repository.findById(ordemId);
 
-        if (usuarioOptional.isEmpty() || ordemOptional.isEmpty()) {
+        if (usuarioOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        ordemOptional.get().setDesenvolvedor(usuarioOptional.get());
-        ordemOptional.get().setDataInicioAtendimento(LocalDate.now());
-        ordemOptional.get().setPrazoParaConclusao(dto.getPrazo());
+        OrdemDeServico ordemDeServico = osService.atribuiADev(ordemId, usuarioOptional.get(), dto);
 
-        return ResponseEntity.ok(ordemOptional.get());
+        if (ordemDeServico == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(ordemDeServico);
     }
 
     @GetMapping("/{ordemId}/feedbacks")
     public ResponseEntity<List<Feedback>> retornaFeedbacksDaOs(@PathVariable("ordemId") final Integer ordemId) {
-        List<Feedback> feedbacks = feedBackRepository.findAllByOrdemDeServicoId(ordemId);
-        return ResponseEntity.ok(feedbacks);
+        return ResponseEntity.ok(feedbackService.buscaTodasPelaOrdemDeServico(ordemId));
     }
 
     @PostMapping("/{ordemId}/feedbacks")
@@ -103,35 +92,19 @@ public class OSController {
                                                    @PathVariable("ordemId") final Integer ordemId) {
 
         Optional<Usuario> usuarioOptional = usuarioRepository.findById(feedbackDTO.getAutorId());
-        Optional<OrdemDeServico> ordemOptional = repository.findById(ordemId);
+        Optional<OrdemDeServico> ordemOptional = osService.buscaPorId(ordemId);
 
         if (usuarioOptional.isEmpty() || ordemOptional.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        Feedback feedback = new Feedback();
-        feedback.setAutor(usuarioOptional.get());
-        feedback.setDataDeCriacao(LocalDateTime.now());
-        feedback.setOrdemDeServico(ordemOptional.get());
-        feedback.setDescricao(feedbackDTO.getMensagem());
-
-        Feedback saved = feedBackRepository.save(feedback);
-
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(feedbackService.cria(feedbackDTO, ordemOptional.get(), usuarioOptional.get()));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Void> fecharOs(@PathVariable Integer id) {
-        repository.findById(id).ifPresent(os -> os.setStatus(Status.FECHADA));
-
+        osService.fechar(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("/usuarios")
-    public ResponseEntity<List<Usuario>> buscaUsuarios(@RequestParam(value = "nome", required = false) final String nome,
-                                                       @RequestParam(value = "email", required = false) final String email) {
-
-        return ResponseEntity.ok(usuarioRepository.findByNomeAndEmail(nome, email));
     }
 }

@@ -6,14 +6,15 @@ import br.com.devdolls.sos.entities.TipoUsuario;
 import br.com.devdolls.sos.entities.Usuario;
 import br.com.devdolls.sos.entities.enums.Status;
 import br.com.devdolls.sos.repositories.OSRepository;
-import br.com.devdolls.sos.services.os.OSService;
+import br.com.devdolls.sos.services.os.OSServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import java.time.LocalDate;
 import java.util.Optional;
@@ -22,14 +23,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class OSServiceTest {
 
-    @Autowired
-    private OSService service;
+    @InjectMocks
+    private OSServiceImpl service;
 
-    @MockBean
+    @Mock
     private OSRepository repository;
 
     @Test

@@ -45,3 +45,17 @@ Rodando a aplicação utilizando o Maven
 ```
 $ ./mvnw spring-boot:run
 ```
+
+## Qualidade do código
+
+O projeto utiliza o Spotless para validação e auto-formatação de código.
+
+Para validar se o código está de acordo com as regras:
+```
+$ ./mvnw spotless:check
+```
+
+Para auto-formatação do código:
+```
+$ ./mvnw spotless:apply
+```
